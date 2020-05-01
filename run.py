@@ -17,7 +17,7 @@ def _cache_sig(filepath):
 
 def _cached_sentences_index(filepath):
     sig = _cache_sig(filepath)
-    cache = '%s/%s.sentidx' % (_CACHE, sig)
+    cache = f'{_CACHE}/{sig.sentidx}'
 
     try:
         f = open(cache, 'rb')
@@ -41,7 +41,7 @@ def _cached_sentences_index(filepath):
 def _cached_vocab(filepath):
     sig = _cache_sig(filepath)
     try:
-        with open('%s/%s.vocab' % (_CACHE, sig), 'rb') as f:
+        with open('{_CACHE}/{sig.vocab}', 'rb') as f:
             vocab_bin = f.read()
     except IOError:
         sent_idx = _cached_sentences_index(filepath)
@@ -49,7 +49,7 @@ def _cached_vocab(filepath):
             lines = (line.decode('utf-8') for line in fh)
             vocab = text.vocabulary(text.iter_tokens(text.iter_sentences(lines, sent_idx)))
         vocab_bin = compress(json.dumps(vocab))
-        with open('%s/%s.vocab' % (_CACHE, sig), 'wb') as f:
+        with open('{_CACHE}/{sig.vocab}', 'wb') as f:
             f.write(vocab_bin)
     else:
         vocab = json.loads(decompress(vocab_bin))
@@ -90,7 +90,7 @@ def ngramgen(source, *cuttoff_info):
 
     for dict_ in res:
         for tpl, v in dict_.iteritems():
-            print (' '.join(tpl) + ' ' + unicode(v)).encode('utf-8')
+            print(f"{' '.join(tpl)} {unicode(v).encode('utf-8')}")
 
 def sentences(source, slice_ = None):
     """Fetch one or more sentences from a document"""
@@ -108,7 +108,7 @@ def sentences(source, slice_ = None):
     else:
         slice_ = [s.strip() for s in slice_.split(':')]
         if len(slice_) > 2:
-            print(f'Invalid slice: {':'.join(slice_)}')
+            print(f"Invalid slice: {':'.join(slice_)}")
             return
         if len(slice_) == 2:
             l, r = slice_
@@ -138,7 +138,7 @@ def concordance(source, word, window = 4):
     try:
         fh = open(source, 'r')
     except Exception:
-        print(f'File not found: {source')
+        print(f'File not found: {source}')
         return
 
     word = word.decode('utf-8')
@@ -176,7 +176,7 @@ def _multi_iter_tokenize(sources):
 
 def build_tagger(tagger_name, *sources):
     """Build a tagger given one or more documents"""
-    sig = '%s/%s.tagger' % (_CACHE, tagger_name)
+    sig = f'{_CACHE}/{tagger_name.tagger}'
     ftager = open(sig, 'wb')
     itokens = _multi_iter_tokenize(sources)
     tagger_ = tagger.build_tagger(itokens)
@@ -191,7 +191,7 @@ def build_tagger(tagger_name, *sources):
     ftager.close()
 
 def _load_tagger(tagger_name):
-    sig = '%s/%s.tagger' % (_CACHE, tagger_name)
+    sig = f'{_CACHE}/{tagger_name.tagger}'
     with open(sig, 'rb') as f:
         list_tagger = json.loads(decompress(f.read()))
     tagger = {'L':defaultdict(tuple), 'M': defaultdict(tuple), 'R':defaultdict(tuple)}

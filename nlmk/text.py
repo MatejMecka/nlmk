@@ -11,9 +11,7 @@ key0 = itemgetter(0)
 def sentence(tx, i, sent_idx):
     """Returns i-th sentence from tx (file-like text feed), given sentence index"""
     if i > len(sent_idx):
-        raise IndexError, "Text has %d sentences, wanted %d"\
-                          % (len(sent_idx) + 1, i + 1)
-
+        raise IndexError, f"Text has {len(sent_idx) + 1} sentences, wanted {i + 1}"
     if i == 0:
         sent = ra_unicode_read(tx, 0, sent_idx[0])
     elif i == len(sent_idx):
