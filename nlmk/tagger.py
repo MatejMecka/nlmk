@@ -70,7 +70,7 @@ _exact = {
   'G': [u'е']}
 
 _inv_exact = dict((w, tag_)
-                  for tag_, words in _exact.iteritems()
+                  for tag_, words in _exact.items()
                   for w in words)
 _base_tags = {
   'GP':   'PL',
@@ -106,7 +106,7 @@ def tag(token, base = True):
             return _base_tags.get(tag_, tag_)
         return tag_
 
-    for ext, tag_ in _ext.iteritems():
+    for ext, tag_ in _ext.items():
         if token.endswith(ext):
             if base:
                 return _base_tags.get(tag_, tag_)

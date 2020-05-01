@@ -11,7 +11,7 @@ key0 = itemgetter(0)
 def sentence(tx, i, sent_idx):
     """Returns i-th sentence from tx (file-like text feed), given sentence index"""
     if i > len(sent_idx):
-        raise IndexError, f"Text has {len(sent_idx) + 1} sentences, wanted {i + 1}"
+        IndexError(f"Text has {len(sent_idx) + 1} sentences, wanted {i + 1}")
     if i == 0:
         sent = ra_unicode_read(tx, 0, sent_idx[0])
     elif i == len(sent_idx):
@@ -126,7 +126,7 @@ def vocabulary(token_triplets):
 
 def _vocabulary_idx_look(vocabulary, sent_id, token_id):
     """Reverse lookup in a vocabulary, returns word at index: `sent_id`, `token_id`"""
-    for word, positions in vocabulary.iteritems():
+    for word, positions in vocabulary.items():
         for sent_id_, token_id_ in positions:
             if sent_id_ == sent_id and token_id_ == token_id:
                 return word

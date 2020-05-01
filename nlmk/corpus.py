@@ -10,4 +10,4 @@ def tf_distribution(tokens):
 
     norm = 1.0/max_
     return dict((token, val*norm)
-                for token, val in tf_dist.iteritems())
+                for token, val in tf_dist.items())

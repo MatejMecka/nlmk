@@ -28,7 +28,7 @@ def cutt_ngrams(ngrams, cuttoff_info):
     for i in range(len(ngrams)):
         cuttoff = cuttoff_info[i]
         ngrams[i] = dict( (key, val)
-                         for key, val in ngrams[i].iteritems()
+                         for key, val in ngrams[i].items()
                          if val >= cuttoff)
     return ngrams
 

@@ -89,7 +89,7 @@ def ngramgen(source, *cuttoff_info):
     res = ngramgenmod.cutt_ngrams(res, cuttoff_info)
 
     for dict_ in res:
-        for tpl, v in dict_.iteritems():
+        for tpl, v in dict_.items():
             print(f"{' '.join(tpl)} {unicode(v).encode('utf-8')}")
 
 def sentences(source, slice_ = None):
@@ -184,8 +184,8 @@ def build_tagger(tagger_name, *sources):
     l, m, r = tagger_['L'], tagger_['M'], tagger_['R']
 
     list_tagger = [dict(('_'.join(key), values)
-                         for key, values in T.iteritems())
-                   for T in l, m, r]
+                         for key, values in T.items())
+                   for T in (l, m, r)]
     tagger_ = compress(json.dumps(list_tagger))
     ftager.write(tagger_)
     ftager.close()
@@ -198,7 +198,7 @@ def _load_tagger(tagger_name):
     index_ = iter(['L', 'M', 'R'])
     for T in list_tagger:
         t_key = next(index_)
-        for key, values in T.iteritems():
+        for key, values in T.items():
             key = tuple(str(key).split('_'))
             tagger[t_key][key] = tuple(map(str, values))
 
@@ -245,7 +245,7 @@ def main():
         case = _runners[case]
     except KeyError:
         print(f'Runner {case} not found.\nAvailable runners:')
-        for runner, runner_fc in _runners.iteritems():
+        for runner, runner_fc in _runners.items():
             print('    {runnner}: { runner_fc.__doc__}')
         return
 
