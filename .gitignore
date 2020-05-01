@@ -5,3 +5,4 @@
 .directory
 test
 .cache
+.DS_Store
