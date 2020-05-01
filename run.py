@@ -63,17 +63,17 @@ def ngramgen(source, *cuttoff_info):
     try:
         fh = open(source, 'r')
     except Exception:
-        print 'File not found:', source
+        print(f'File not found: {source}')
         return
 
     try:
         cuttoff_info = map(int, cuttoff_info)
     except ValueError:
-        print 'Invalid cuttoff info provided, list of integers needed'
+        print('Invalid cuttoff info provided, list of integers needed')
         return
 
     if len(cuttoff_info) == 0:
-        print 'Cuttoff info provided is zero length'
+        print('Cuttoff info provided is zero length')
         return
 
     sent_idx = _cached_sentences_index(source)
@@ -97,7 +97,7 @@ def sentences(source, slice_ = None):
     try:
         fh = open(source, 'r')
     except Exception:
-        print 'File not found:', source
+        print(f'File not found: {source}')
         return
 
     sent_idx = _cached_sentences_index(source)
@@ -108,7 +108,7 @@ def sentences(source, slice_ = None):
     else:
         slice_ = [s.strip() for s in slice_.split(':')]
         if len(slice_) > 2:
-            print 'Invalid slice:', ':'.join(slice_)
+            print(f'Invalid slice: {':'.join(slice_)}')
             return
         if len(slice_) == 2:
             l, r = slice_
@@ -129,7 +129,7 @@ def sentences(source, slice_ = None):
             l, r = 0, total_sents
 
     for i in range(l, r):
-        print text.sentence(fh, i, sent_idx).encode('utf-8')
+        print(text.sentence(fh, i, sent_idx).encode('utf-8'))
 
     fh.close()
 
@@ -138,7 +138,7 @@ def concordance(source, word, window = 4):
     try:
         fh = open(source, 'r')
     except Exception:
-        print 'File not found:', source
+        print(f'File not found: {source')
         return
 
     word = word.decode('utf-8')
@@ -147,7 +147,7 @@ def concordance(source, word, window = 4):
     lines = (line.decode('utf-8') for line in fh)
     itokens = tokenizer.iter_tokenize(lines)
     for window in text.concordance(word, itokens, window):
-        print ' '.join(window).encode('utf-8')
+        print(' '.join(window).encode('utf-8'))
     fh.close()
 
 def contexts(source, word):
@@ -155,7 +155,7 @@ def contexts(source, word):
     try:
         fh = open(source, 'r')
     except Exception:
-        print 'File not found:', source
+        print(f'File not found: {source}')
         return
 
     fh.close()
@@ -163,7 +163,7 @@ def contexts(source, word):
     word = word.decode('utf-8')
     vocab = _cached_vocab(source)
     ctx = sorted(l + ' ' + r for l, r in text.contexts(word, vocab))
-    for c in ctx: print c.encode('utf-8')
+    for c in ctx: print(c.encode('utf-8'))
 
 def _multi_iter_tokenize(sources):
     for source in sources:
@@ -214,7 +214,7 @@ def tag(source, tagger_name):
         tmp = token.encode('utf-8')
         if tag is not None:
             tmp = tmp + ' {{%s}}' % tag
-        print tmp,
+        print(tmp)
     fh.close()
 
 def tf(source):
@@ -226,7 +226,7 @@ def tf(source):
     distribution = corpus.tf_distribution(itokens).items()
     distribution.sort(key = lambda item: -item[1])
     for token, val in distribution:
-        print token.encode('utf-8'), '%.4f' % val
+        print(token.encode('utf-8'), '%.4f' % val)
 
 _runners = {'ngramgen': ngramgen, 'sentences': sentences, 'concordance': concordance,
             'contexts': contexts, 'build-tagger': build_tagger, 'tag': tag,
@@ -244,9 +244,9 @@ def main():
     try:
         case = _runners[case]
     except KeyError:
-        print 'Runner %s not found.\nAvailable runners:' % case
+        print(f'Runner {case} not found.\nAvailable runners:')
         for runner, runner_fc in _runners.iteritems():
-            print '    %s: %s' % (runner, runner_fc.__doc__)
+            print('    {runnner}: { runner_fc.__doc__}')
         return
 
     args = argv[2:]

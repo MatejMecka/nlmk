@@ -43,7 +43,7 @@ def tokenize(feed, include_junk = True, echo_junk = False):
             junk = feed[start:s].strip()
             if junk != "":
                 if include_junk: tokens.append(junk)
-                if echo_junk: print junk
+                if echo_junk: print(junk)
         if t[0]:
             tokens.append(t[0])
         start = e
@@ -51,7 +51,7 @@ def tokenize(feed, include_junk = True, echo_junk = False):
     junk = feed[start:].strip()
     if junk != "":
         if include_junk: tokens.append(junk)
-        if echo_junk: print junk
+        if echo_junk: print(junk)
 
     return tokens
 
