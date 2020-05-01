@@ -130,7 +130,7 @@ def _vocabulary_idx_look(vocabulary, sent_id, token_id):
         for sent_id_, token_id_ in positions:
             if sent_id_ == sent_id and token_id_ == token_id:
                 return word
-    raise IndexError, 'position not in vocabulary'
+    IndexError('position not in vocabulary')
 
 
 def contexts(word, vocabulary):
