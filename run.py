@@ -13,18 +13,18 @@ from nlmk import ngramgen as ngramgenmod
 _CACHE = abspath(dirname(__file__)) + '/.cache'
 
 def _cache_sig(filepath):
-    return md5(abspath(filepath)).hexdigest()
+    return md5(abspath(filepath).encode('utf-8')).hexdigest()
 
 def _cached_sentences_index(filepath):
     sig = _cache_sig(filepath)
-    cache = f'{_CACHE}/{sig.sentidx}'
+    cache = f'{_CACHE}/{sig}.sentidx'
 
     try:
         f = open(cache, 'rb')
     except IOError:
         with open(filepath, 'r') as f:
             content = f.read()
-            sent_idx = tokenizer.sentences_index(content.decode('utf-8'))
+            sent_idx = tokenizer.sentences_index(content)
         with open(cache, 'wb') as f:
             for i in sent_idx:
                 f.write(pack('I', i))
@@ -61,7 +61,7 @@ def ngramgen(source, *cuttoff_info):
     """Generate n-grams with provided cuttoff"""
 
     try:
-        fh = open(source, 'r')
+        fh = open(source, 'r', encoding='UTF-8')
     except Exception:
         print(f'File not found: {source}')
         return
@@ -95,7 +95,7 @@ def ngramgen(source, *cuttoff_info):
 def sentences(source, slice_ = None):
     """Fetch one or more sentences from a document"""
     try:
-        fh = open(source, 'r')
+        fh = open(source, 'r', encoding='UTF-8')
     except Exception:
         print(f'File not found: {source}')
         return
@@ -129,31 +129,30 @@ def sentences(source, slice_ = None):
             l, r = 0, total_sents
 
     for i in range(l, r):
-        print(text.sentence(fh, i, sent_idx).encode('utf-8'))
+        print(text.sentence(fh, i, sent_idx))
 
     fh.close()
 
 def concordance(source, word, window = 4):
     """Concordance, finds word in a document along with context"""
     try:
-        fh = open(source, 'r')
+        fh = open(source, 'r', encoding='UTF-8')
     except Exception:
         print(f'File not found: {source}')
         return
 
-    word = word.decode('utf-8')
     window = int(window)
 
-    lines = (line.decode('utf-8') for line in fh)
+    lines = (line for line in fh)
     itokens = tokenizer.iter_tokenize(lines)
     for window in text.concordance(word, itokens, window):
-        print(' '.join(window).encode('utf-8'))
+        print(' '.join(window))
     fh.close()
 
 def contexts(source, word):
     """Finds all contexts of a word"""
     try:
-        fh = open(source, 'r')
+        fh = open(source, 'r', encoding='UTF-8')
     except Exception:
         print(f'File not found: {source}')
         return
@@ -167,7 +166,7 @@ def contexts(source, word):
 
 def _multi_iter_tokenize(sources):
     for source in sources:
-        with open(source, 'r') as f:
+        with open(source, 'r', encoding='UTF-8') as f:
             lines = (line.decode('utf-8') for line in f)
             itokens = tokenizer.iter_tokenize(lines)
             for t in itokens:
@@ -177,7 +176,7 @@ def _multi_iter_tokenize(sources):
 def build_tagger(tagger_name, *sources):
     """Build a tagger given one or more documents"""
     sig = f'{_CACHE}/{tagger_name.tagger}'
-    ftager = open(sig, 'wb')
+    ftager = open(sig, 'wb', encoding='UTF-8')
     itokens = _multi_iter_tokenize(sources)
     tagger_ = tagger.build_tagger(itokens)
 
@@ -192,7 +191,7 @@ def build_tagger(tagger_name, *sources):
 
 def _load_tagger(tagger_name):
     sig = f'{_CACHE}/{tagger_name.tagger}'
-    with open(sig, 'rb') as f:
+    with open(sig, 'rb', encoding='UTF-8') as f:
         list_tagger = json.loads(decompress(f.read()))
     tagger = {'L':defaultdict(tuple), 'M': defaultdict(tuple), 'R':defaultdict(tuple)}
     index_ = iter(['L', 'M', 'R'])
@@ -207,11 +206,11 @@ def _load_tagger(tagger_name):
 def tag(source, tagger_name):
     """Tag a document using a pre-built tagger"""
     tagger_ = _load_tagger(tagger_name)
-    fh = open(source, 'r')
-    lines = (line.decode('utf-8') for line in fh)
+    fh = open(source, 'r', encoding='UTF-8')
+    lines = (line for line in fh)
     itokens = tokenizer.iter_tokenize(lines)
     for token, tag in tagger.smart_tag(itokens, tagger_):
-        tmp = token.encode('utf-8')
+        tmp = token
         if tag is not None:
             tmp = tmp + ' {{%s}}' % tag
         print(tmp)
@@ -219,14 +218,14 @@ def tag(source, tagger_name):
 
 def tf(source):
     """Term frequency distribution"""
-    fh = open(source, 'r')
-    lines = (line.decode('utf-8') for line in fh)
+    fh = open(source, 'r', encoding='UTF-8')
+    lines = (line for line in fh)
     itokens = tokenizer.iter_tokenize(lines)
     itokens = (token.lower() for token in itokens if token[0].isalpha())
     distribution = corpus.tf_distribution(itokens).items()
     distribution.sort(key = lambda item: -item[1])
     for token, val in distribution:
-        print(token.encode('utf-8'), '%.4f' % val)
+        print(token, '%.4f' % val)
 
 _runners = {'ngramgen': ngramgen, 'sentences': sentences, 'concordance': concordance,
             'contexts': contexts, 'build-tagger': build_tagger, 'tag': tag,

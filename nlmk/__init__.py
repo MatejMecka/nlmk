@@ -9,7 +9,7 @@ def ra_unicode_read(fh, start, end):
 
     buf = u""
     iter_fh = iter(fh)
-    iter_fh = (line.decode('utf-8') for line in iter_fh)
+    iter_fh = (line for line in iter_fh)
     for line in iter_fh:  # read file line-by-line...
         line_len = len(line)
         if line_len < start:        # .. recalibrate start/end ...
@@ -24,7 +24,7 @@ def ra_unicode_read(fh, start, end):
             break
     if end is not None:
         while len(buf) < end:             # read enough lines so the end is met
-            buf = buf + iter_fh.next()
+            buf = buf + iter_fh.__next__()
         buf = buf[:end]
 
     fh.seek(tmp_pos)   # restore the file position
