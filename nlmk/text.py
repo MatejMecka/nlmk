@@ -26,7 +26,7 @@ def iter_sentences(tx, sent_idx):
     """Iterates through sentences of a text previously segmented"""
     buf = u''
     sent_iter = iter(sent_idx)
-    end = sent_iter.next()
+    end = sent_iter.__next__()
     len_ = end
     for line in tx:  # read through file and do sentence segmentation
         buf = buf + line
@@ -35,7 +35,7 @@ def iter_sentences(tx, sent_idx):
             yield part.replace(u'\n', u' ').replace(u'\t', u' ').strip()  # yield sentence
             buf = buf[len_:]   # cutoff the buffer
             try:
-                new_end = sent_iter.next()  # get the end and lenght of next sentence
+                new_end = sent_iter.__next__()  # get the end and lenght of next sentence
                 len_ = new_end - end
                 end = new_end
             except StopIteration: # all sentences yielded, finish off the text

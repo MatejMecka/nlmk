@@ -6,7 +6,6 @@ from struct import pack, unpack, calcsize
 from collections import defaultdict
 import json
 from zlib import compress, decompress
-
 from nlmk import text, tokenizer, tagger, corpus
 from nlmk import ngramgen as ngramgenmod
 
@@ -41,12 +40,12 @@ def _cached_sentences_index(filepath):
 def _cached_vocab(filepath):
     sig = _cache_sig(filepath)
     try:
-        with open('{_CACHE}/{sig.vocab}', 'rb') as f:
+        with open('{_CACHE}/{sig}.vocab', 'rb') as f:
             vocab_bin = f.read()
     except IOError:
         sent_idx = _cached_sentences_index(filepath)
         with open(filepath, 'r') as fh:
-            lines = (line.decode('utf-8') for line in fh)
+            lines = (line for line in fh)
             vocab = text.vocabulary(text.iter_tokens(text.iter_sentences(lines, sent_idx)))
         vocab_bin = compress(json.dumps(vocab))
         with open('{_CACHE}/{sig.vocab}', 'wb') as f:
@@ -72,18 +71,18 @@ def ngramgen(source, *cuttoff_info):
         print('Invalid cuttoff info provided, list of integers needed')
         return
 
-    if len(cuttoff_info) == 0:
+    if len(list(cuttoff_info)) == 0:
         print('Cuttoff info provided is zero length')
         return
 
     sent_idx = _cached_sentences_index(source)
 
     fh.seek(0)
-    lines = (line.decode('utf-8') for line in fh)
+    lines = (line for line in fh)
     isents = text.iter_sentences(lines, sent_idx)
 
     itokens = (t for t, s, tid in text.iter_tokens(isents))
-    res = ngramgenmod.multi_ngram(itokens, len(cuttoff_info))
+    res = ngramgenmod.multi_ngram(itokens, len(list(cuttoff_info)))
     fh.close()
 
     res = ngramgenmod.cutt_ngrams(res, cuttoff_info)
@@ -167,7 +166,7 @@ def contexts(source, word):
 def _multi_iter_tokenize(sources):
     for source in sources:
         with open(source, 'r', encoding='UTF-8') as f:
-            lines = (line.decode('utf-8') for line in f)
+            lines = (line for line in f)
             itokens = tokenizer.iter_tokenize(lines)
             for t in itokens:
                 yield t
@@ -175,8 +174,8 @@ def _multi_iter_tokenize(sources):
 
 def build_tagger(tagger_name, *sources):
     """Build a tagger given one or more documents"""
-    sig = f'{_CACHE}/{tagger_name.tagger}'
-    ftager = open(sig, 'wb', encoding='UTF-8')
+    sig = f'{_CACHE}/{tagger_name}.tagger'
+    ftager = open(sig, 'w')
     itokens = _multi_iter_tokenize(sources)
     tagger_ = tagger.build_tagger(itokens)
 
@@ -191,7 +190,7 @@ def build_tagger(tagger_name, *sources):
 
 def _load_tagger(tagger_name):
     sig = f'{_CACHE}/{tagger_name.tagger}'
-    with open(sig, 'rb', encoding='UTF-8') as f:
+    with open(sig, 'r') as f:
         list_tagger = json.loads(decompress(f.read()))
     tagger = {'L':defaultdict(tuple), 'M': defaultdict(tuple), 'R':defaultdict(tuple)}
     index_ = iter(['L', 'M', 'R'])

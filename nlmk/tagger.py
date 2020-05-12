@@ -2,6 +2,7 @@
 from collections import defaultdict
 from operator import or_, itemgetter
 from itertools import tee
+from functools import reduce
 
 from nlmk.text import iter_ngrams
 
